@@ -71,12 +71,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     private static function getDevUsers()
     {
-        return [
-            "ava@psu.edu", // for automated testing
-            "kelly@psu.edu", // for running on local
-            "mms282@psu.edu", // for real
-            "maw5114@psu.edu", // for real
-        ];
+        return explode(',', config('app.supers'));
     }
 
 }
