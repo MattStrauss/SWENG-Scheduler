@@ -24,7 +24,7 @@
 
                     <p>
                         {{ __('If you did not receive the email') }}, <a
-                            class="text-blue-800 hover:text-blue-700 no-underline hover:underline cursor-pointer"
+                            class="text-blue-800 hover:text-blue-900 no-underline hover:underline cursor-pointer"
                             onclick="event.preventDefault(); document.getElementById('resend-verification-form').submit();">{{ __('click here to request another') }}</a>.
                     </p>
 

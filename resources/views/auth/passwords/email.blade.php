@@ -42,7 +42,7 @@
                             {{ __('Send Password Reset Link') }}
                         </button>
 
-                        <p class="mt-4 text-xs text-blue-800 hover:text-blue-700 whitespace-no-wrap no-underline hover:underline sm:text-sm sm:order-0 sm:m-0">
+                        <p class="mt-4 text-xs text-blue-800 hover:text-blue-900 whitespace-no-wrap no-underline hover:underline sm:text-sm sm:order-0 sm:m-0">
                             <a class="text-blue-800 hover:text-blue-700 no-underline" href="{{ route('login') }}">
                                 {{ __('Back to login') }}
                             </a>
