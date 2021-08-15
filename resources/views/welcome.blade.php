@@ -35,6 +35,7 @@
                 <h1 class="mb-6 text-gray-600 text-center font-light tracking-wider text-4xl sm:mb-8 sm:text-6xl">
                     {{ config('app.name', 'Laravel') }}
                 </h1>
+                <p class="text-gray-600 text-center font-light tracking-wider text-4xl sm:mb-8 sm:text-xl">Course Explorer and Schedule Builder Tool</p>
             </div>
         </div>
     </div>
