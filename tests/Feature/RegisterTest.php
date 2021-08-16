@@ -57,6 +57,8 @@ class RegisterTest extends TestCase
 
         $response = $this->from(route('register'))->post('register', $data);
 
+        Notification::assertNothingSent();
+
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrorsIn('email');
 
