@@ -27,7 +27,8 @@ class AppServiceProvider extends ServiceProvider
         $navItems = json_encode([
             ['name'=> "Home", 'uri' => "/courses", 'active' => false],
             ['name'=> "Mark Courses Completed", 'uri' => '/mark-completed', 'active' => false],
-            ['name'=> "Get Course Recommendations", 'uri' => '/recommendations', 'active' => false]
+            ['name'=> "Get Course Recommendations", 'uri' => '/recommendations', 'active' => false],
+            ['name'=> "View Users", 'uri' => '/users', 'active' => false]
         ]);
 
         View::share('navItems', $navItems);

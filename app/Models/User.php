@@ -69,7 +69,7 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @return string[]
      */
-    private static function getDevUsers()
+    public static function getDevUsers()
     {
         return explode(',', config('app.supers'));
     }

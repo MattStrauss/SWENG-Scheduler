@@ -110,14 +110,14 @@ function AppController(props) {
 }
 export default AppController;
 
-if (document.getElementById("myTest")) {
-    const courses = document.getElementById("myTest").getAttribute("data");
-    const completed = document.getElementById("myTest").getAttribute("data-courses");
+if (document.getElementById("curriculumGraph")) {
+    const courses = document.getElementById("curriculumGraph").getAttribute("data-courses");
+    const completed = document.getElementById("curriculumGraph").getAttribute("data-completed");
 
     ReactDOM.render(
         <React.StrictMode>
             <AppController courses={courses} completed={completed}/>
         </React.StrictMode>,
-        document.getElementById("myTest")
+        document.getElementById("curriculumGraph")
     );
 }

@@ -5,8 +5,14 @@ class Navigation extends React.Component {
 
     constructor(props){
         super(props);
+
+        const navItems = JSON.parse(this.props.nav);
+        if (! this.props.isSuperUser) {
+            navItems.pop();
+        }
+
         this.nav = {
-            'links' : JSON.parse(this.props.nav)
+            'links' : navItems
         }
 
     };
@@ -38,7 +44,8 @@ export default Navigation;
 if (document.getElementById('navigation')) {
 
     // get props
-    const data = document.getElementById('navigation').getAttribute('data');
+    const data = document.getElementById('navigation').getAttribute('data-nav');
+    const isSuperUser = document.getElementById('navigation').getAttribute('data-super')
 
-    ReactDOM.render(<Navigation nav={data}/>, document.getElementById('navigation'));
+    ReactDOM.render(<Navigation nav={data} isSuperUser={isSuperUser}/>, document.getElementById('navigation'));
 }

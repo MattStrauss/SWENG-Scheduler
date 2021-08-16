@@ -2055,13 +2055,13 @@ function AppController(props) {
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AppController);
 
-if (document.getElementById("myTest")) {
-  var courses = document.getElementById("myTest").getAttribute("data");
-  var completed = document.getElementById("myTest").getAttribute("data-courses");
+if (document.getElementById("curriculumGraph")) {
+  var courses = document.getElementById("curriculumGraph").getAttribute("data-courses");
+  var completed = document.getElementById("curriculumGraph").getAttribute("data-completed");
   react_dom__WEBPACK_IMPORTED_MODULE_2__.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.StrictMode, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(AppController, {
     courses: courses,
     completed: completed
-  })), document.getElementById("myTest"));
+  })), document.getElementById("curriculumGraph"));
 }
 
 /***/ }),
@@ -3467,8 +3467,14 @@ var Navigation = /*#__PURE__*/function (_React$Component) {
     _classCallCheck(this, Navigation);
 
     _this = _super.call(this, props);
+    var navItems = JSON.parse(_this.props.nav);
+
+    if (!_this.props.isSuperUser) {
+      navItems.pop();
+    }
+
     _this.nav = {
-      'links': JSON.parse(_this.props.nav)
+      'links': navItems
     };
     return _this;
   }
@@ -3498,9 +3504,11 @@ var Navigation = /*#__PURE__*/function (_React$Component) {
 
 if (document.getElementById('navigation')) {
   // get props
-  var data = document.getElementById('navigation').getAttribute('data');
+  var data = document.getElementById('navigation').getAttribute('data-nav');
+  var isSuperUser = document.getElementById('navigation').getAttribute('data-super');
   react_dom__WEBPACK_IMPORTED_MODULE_1__.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Navigation, {
-    nav: data
+    nav: data,
+    isSuperUser: isSuperUser
   }), document.getElementById('navigation'));
 }
 
