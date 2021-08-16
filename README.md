@@ -1,6 +1,9 @@
 # PennState-Class-Scheduler
 Penn State Software Enginnering Bachelor's Degree Course Recomendation Tool
 
+### Quick preview of the tool
+https://screencast-o-matic.com/watch/crjQbsVjDJT
+
 ## Getting the project installed and running locally:
 
 ### Installing the project's dependencies 
