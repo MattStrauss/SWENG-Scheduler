@@ -41,7 +41,7 @@ class UserController extends Controller
     {
 
         $pageName = "Application Users";
-        $users = User::all();
+        $users = User::orderBy('created_at', 'desc')->get()->all();
 
         return view('users', compact('pageName', 'users'));
     }
