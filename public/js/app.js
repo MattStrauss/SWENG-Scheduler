@@ -3467,8 +3467,14 @@ var Navigation = /*#__PURE__*/function (_React$Component) {
     _classCallCheck(this, Navigation);
 
     _this = _super.call(this, props);
+    var navItems = JSON.parse(_this.props.nav);
+
+    if (!_this.props.isSuperUser) {
+      navItems.pop();
+    }
+
     _this.nav = {
-      'links': JSON.parse(_this.props.nav)
+      'links': navItems
     };
     return _this;
   }
@@ -3498,9 +3504,11 @@ var Navigation = /*#__PURE__*/function (_React$Component) {
 
 if (document.getElementById('navigation')) {
   // get props
-  var data = document.getElementById('navigation').getAttribute('data');
+  var data = document.getElementById('navigation').getAttribute('data-nav');
+  var isSuperUser = document.getElementById('navigation').getAttribute('data-super');
   react_dom__WEBPACK_IMPORTED_MODULE_1__.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Navigation, {
-    nav: data
+    nav: data,
+    isSuperUser: isSuperUser
   }), document.getElementById('navigation'));
 }
 
