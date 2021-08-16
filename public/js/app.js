@@ -2055,13 +2055,13 @@ function AppController(props) {
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AppController);
 
-if (document.getElementById("myTest")) {
-  var courses = document.getElementById("myTest").getAttribute("data");
-  var completed = document.getElementById("myTest").getAttribute("data-courses");
+if (document.getElementById("curriculumGraph")) {
+  var courses = document.getElementById("curriculumGraph").getAttribute("data-courses");
+  var completed = document.getElementById("curriculumGraph").getAttribute("data-completed");
   react_dom__WEBPACK_IMPORTED_MODULE_2__.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.StrictMode, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(AppController, {
     courses: courses,
     completed: completed
-  })), document.getElementById("myTest"));
+  })), document.getElementById("curriculumGraph"));
 }
 
 /***/ }),
