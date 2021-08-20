@@ -63,6 +63,7 @@ class CourseController extends Controller
     {
         $course = Course::create($request->all());
         $course->semesters()->sync($request->input('semester'));
+        $course->professors()->sync($request->input('professors'));
 
         return redirect()->route('courses.index')->with('status', $course->title . ' Successfully Created!');
     }
