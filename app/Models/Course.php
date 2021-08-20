@@ -18,6 +18,13 @@ class Course extends Model
     protected $fillable = ["title", "description", "credits", "type", "abbreviation", 'prerequisites', 'concurrents',
                             'prerequisites_for_count', 'semester_specific'];
 
+    /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
+    protected $with = ['professors'];
+
 
     /**
      * The attributes that should be cast to native types.

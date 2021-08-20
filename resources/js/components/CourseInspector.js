@@ -88,6 +88,32 @@ function CourseInspector(props) {
         }
     };
 
+    /**
+     * Builds the jsx for each enabled course list item
+     * @param {Course} props
+     * @returns
+     */
+    const professors = (props) => {
+        if (
+            props.selectedCourse &&
+            props.selectedCourse.professors.length > 0
+        ) {
+            return props.selectedCourse.professors.map((prof, key) => {
+
+                return (
+                    <div
+                        key={key}
+                        className="related-course-row text-gray-700"
+                    >
+                        {prof.name}
+                    </div>
+                );
+            });
+        } else {
+            return <div className="related-course-row text-gray-700">Unkown</div>
+        }
+    };
+
     return (
         <div className="left">
             <div id="inspector-selected-course">
@@ -143,6 +169,14 @@ function CourseInspector(props) {
                         </div>
                         <div id="inspector-related-course">
                             {openItems(props)}
+                        </div>
+                    </div>
+                    <div className="related-course-wrapper">
+                        <div className="inspector-data-label text-gray-500">
+                            Professors:
+                        </div>
+                        <div id="inspector-related-course">
+                            {professors(props)}
                         </div>
                     </div>
                 </div>
