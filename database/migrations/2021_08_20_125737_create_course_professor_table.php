@@ -13,7 +13,7 @@ class CreateCourseProfessorTable extends Migration
      */
     public function up()
     {
-        Schema::table('course_professor', function (Blueprint $table) {
+        Schema::create('course_professor', function (Blueprint $table) {
             $table->id();
             $table->foreignId('course_id')->references('id')->on('courses')->onDelete('cascade');
             $table->foreignId('professor_id')->references('id')->on('professors')->onDelete('cascade');
@@ -28,8 +28,6 @@ class CreateCourseProfessorTable extends Migration
      */
     public function down()
     {
-        Schema::table('course_professor', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('course_professor');
     }
 }
