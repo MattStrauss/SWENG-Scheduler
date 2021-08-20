@@ -44,6 +44,11 @@ class Course extends Model
         return $this->belongsToMany(User::class);
     }
 
+    public function professors()
+    {
+        return $this->belongsToMany(Professor::class);
+    }
+
     /**
      * Helpers
      */
