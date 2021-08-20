@@ -20,6 +20,20 @@
             @endforeach
         </p>
 
+        <p><strong>Professor(s)</strong>:
+            @if ($course->professors->isNotEmpty())
+                @foreach($course->professors as $professor)
+                    @if (! $loop->last)
+                        {{$professor->name}},
+                    @else
+                        {{$professor->name}}
+                    @endif
+                @endforeach
+            @else
+                Unknown
+            @endif
+        </p>
+
         <h4><strong>Prerequisites </strong></h4>
         @if(! $course->prerequisites)
             None

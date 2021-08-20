@@ -2553,6 +2553,27 @@ function CourseInspector(props) {
       }, "None");
     }
   };
+  /**
+   * Builds the jsx for each enabled course list item
+   * @param {Course} props
+   * @returns
+   */
+
+
+  var professors = function professors(props) {
+    if (props.selectedCourse && props.selectedCourse.professors.length > 0) {
+      return props.selectedCourse.professors.map(function (prof, key) {
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+          key: key,
+          className: "related-course-row text-gray-700"
+        }, prof.name);
+      });
+    } else {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        className: "related-course-row text-gray-700"
+      }, "Unkown");
+    }
+  };
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "left"
@@ -2598,7 +2619,13 @@ function CourseInspector(props) {
     className: "inspector-data-label text-gray-500"
   }, "Opens Courses:"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     id: "inspector-related-course"
-  }, openItems(props))))));
+  }, openItems(props))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "related-course-wrapper"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "inspector-data-label text-gray-500"
+  }, "Professors:"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    id: "inspector-related-course"
+  }, professors(props))))));
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (CourseInspector);

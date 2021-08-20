@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUpdateCourseRequest;
 use App\Models\Course;
+use App\Models\Professor;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -47,8 +48,9 @@ class CourseController extends Controller
         $pageName = "Create New Course ";
         $course = new Course();
         $courses = Course::all();
+        $professors = Professor::all();
 
-        return view('courses.create', compact('course', 'courses', 'pageName'));
+        return view('courses.create', compact('course', 'courses', 'professors', 'pageName'));
     }
 
     /**
@@ -61,6 +63,7 @@ class CourseController extends Controller
     {
         $course = Course::create($request->all());
         $course->semesters()->sync($request->input('semester'));
+        $course->professors()->sync($request->input('professors'));
 
         return redirect()->route('courses.index')->with('status', $course->title . ' Successfully Created!');
     }
@@ -96,8 +99,9 @@ class CourseController extends Controller
     {
         $pageName = "Edit " . $course->title;
         $courses = Course::all();
+        $professors = Professor::all();
 
-        return view('courses.edit', compact('course', 'courses', 'pageName'));
+        return view('courses.edit', compact('course', 'courses', 'professors', 'pageName'));
     }
 
     /**
@@ -110,6 +114,7 @@ class CourseController extends Controller
     {
         $course->update($request->all());
         $course->semesters()->sync($request->input('semester'));
+        $course->professors()->sync($request->input('professors'));
 
         return back()->with('status', 'Course Successfully Updated!');
     }

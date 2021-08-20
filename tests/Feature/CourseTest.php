@@ -3,16 +3,17 @@
 namespace Tests\Feature;
 
 use App\Models\Course;
+use App\Models\Professor;
+use App\Models\Semester;
 use App\Models\User;
+use Database\Seeders\ProfessorSeeder;
 use Database\Seeders\SemesterSeeder;
+use Database\Seeders\TestingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class CourseTest extends TestCase
 {
-
-    protected $seed = true;
-    protected $seeder = SemesterSeeder::class;
 
     use RefreshDatabase;
 
@@ -25,17 +26,27 @@ class CourseTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->seed(SemesterSeeder::class);
+        $this->seed(ProfessorSeeder::class);
+
         $this->devUser = User::factory()->create(['name' => 'Ava Dev', 'email' => 'ava@psu.edu']);
         $this->regularUser = User::factory()->create(['name' => 'Eli User', 'email' => 'eli@psu.edu']);
+
         $this->courseOne = Course::factory()->create(
             ['title' => 'Test Course One', 'abbreviation' => 'Test 221', 'type' => 'Test']);
         $this->courseOne->semesters()->attach([1, 2]);
+        $this->courseOne->professors()->attach(Professor::where('name', 'Lauren Bello')->first()->id);
+
         $this->courseTwo = Course::factory()->create(
             ['title' => 'Test Course Two', 'abbreviation' => 'Test 311', 'type' => 'Test']);
         $this->courseTwo->semesters()->attach([2]);
+        $this->courseTwo->professors()->attach(Professor::where('name', 'Ahmed Sammoud')->first()->id);
+
         $this->courseThree = Course::factory()->create(
             ['title' => 'Test Course Three', 'abbreviation' => 'Test 432', 'type' => 'Test']);
         $this->courseThree->semesters()->attach([2, 3]);
+        $this->courseThree->professors()->attach(Professor::where('name', 'Seunghoon Bang')->first()->id);
     }
 
     /**  @test */
@@ -116,7 +127,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2]
+            "credits" => 2, "semester" => [1,2], "professors" => [Professor::where('name', 'Seunghoon Bang')->first()->id]
         ];
 
         $response = $this->actingAs($this->devUser)->post(route('courses.store', $data));
@@ -128,6 +139,8 @@ class CourseTest extends TestCase
                                              "description" => "Some random description", "credits" => 2,]);
         $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 1]);
         $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 2]);
+        $this->assertDatabaseHas('course_professor',
+            ['course_id' => $newCourse->id, 'professor_id' => Professor::where('name', 'Seunghoon Bang')->first()->id]);
     }
 
     /**  @test */
@@ -136,7 +149,8 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2], "prerequisites" => [$this->courseOne->id]
+            "credits" => 2, "semester" => [1,2], "prerequisites" => [$this->courseOne->id],
+            "professors" => [Professor::where('name', 'Eugene Walters')->first()->id]
         ];
 
         $response = $this->actingAs($this->devUser)->post(route('courses.store', $data));
@@ -153,6 +167,8 @@ class CourseTest extends TestCase
 
         $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 1]);
         $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 2]);
+        $this->assertDatabaseHas('course_professor',
+            ['course_id' => $newCourse->id, 'professor_id' => Professor::where('name', 'Eugene Walters')->first()->id]);
     }
 
 
@@ -161,7 +177,9 @@ class CourseTest extends TestCase
     {
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2], "concurrents" => [$this->courseOne->id]
+            "credits" => 2, "semester" => [1,2], "concurrents" => [$this->courseOne->id],
+            "professors" => [Professor::where('name', 'Eugene Walters')->first()->id,
+                Professor::where('name', 'Joseph Houck')->first()->id]
         ];
 
         $response = $this->actingAs($this->devUser)->post(route('courses.store', $data));
@@ -179,6 +197,10 @@ class CourseTest extends TestCase
 
         $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 1]);
         $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 2]);
+        $this->assertDatabaseHas('course_professor',
+            ['course_id' => $newCourse->id, 'professor_id' => Professor::where('name', 'Eugene Walters')->first()->id]);
+        $this->assertDatabaseHas('course_professor',
+            ['course_id' => $newCourse->id, 'professor_id' => Professor::where('name', 'Joseph Houck')->first()->id]);
     }
 
     /**  @test */
@@ -188,7 +210,9 @@ class CourseTest extends TestCase
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
             "credits" => 2, "semester" => [1,2], "concurrents" => [$this->courseOne->id],
-            "prerequisites" => [$this->courseTwo->id, $this->courseThree->id]
+            "prerequisites" => [$this->courseTwo->id, $this->courseThree->id],
+            "professors" => [Professor::where('name', 'Ahmed Sammoud')->first()->id,
+                Professor::where('name', 'Meng Su')->first()->id]
         ];
 
         $response = $this->actingAs($this->devUser)->post(route('courses.store', $data));
@@ -207,6 +231,10 @@ class CourseTest extends TestCase
 
         $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 1]);
         $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 2]);
+        $this->assertDatabaseHas('course_professor',
+            ['course_id' => $newCourse->id, 'professor_id' => Professor::where('name', 'Ahmed Sammoud')->first()->id]);
+        $this->assertDatabaseHas('course_professor',
+            ['course_id' => $newCourse->id, 'professor_id' => Professor::where('name', 'Meng Su')->first()->id]);
     }
 
 
@@ -336,7 +364,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 0, "semester" => [4], "prerequisites" => [100]
+            "credits" => 0, "semester" => [2], "prerequisites" => [100]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.create'))
@@ -348,6 +376,24 @@ class CourseTest extends TestCase
         $this->assertDatabaseMissing('courses', ["title" => "Test Course", "abbreviation" => "Test 442",
                                                  "description" => "Some random description", "credits" => 2,
                                                  "prerequisites" => json_encode([(string) 100])]);
+    }
+
+    /**  @test */
+    public function dev_auth_user_can_not_create_a_course_with_invalid_professor_choice()
+    {
+
+        $data = [
+            "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
+            "credits" => 0, "semester" => [2], "prerequisites" => [4], "professors" => [10000001]
+        ];
+
+        $response = $this->actingAs($this->devUser)->from(route('courses.create'))
+                         ->post(route('courses.store', $data));
+
+
+        $response->assertRedirect(route('courses.create'));
+        $response->assertSessionHasErrorsIn('professors');
+        $this->assertDatabaseMissing('course_professor', ['professor_id' => 10000001 ]);
     }
 
     /**  @test */
@@ -454,6 +500,35 @@ class CourseTest extends TestCase
         $this->assertTrue(in_array($this->courseThree->id, $this->courseOne->prerequisites));
 
         $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 2]);
+    }
+
+    /**  @test */
+    public function dev_auth_user_can_update_a_course_with_concurrents_prerequisites_and_professors()
+    {
+
+        $data = [
+            "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
+            "credits" => 2, "semester" => [2], "concurrents" => [(string) $this->courseTwo->id],
+            "prerequisites" => [(string) $this->courseThree->id], "professors" => [Professor::first()->id]
+        ];
+
+        $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseOne->id]))
+                         ->put(route('courses.update', [$this->courseOne->id]), $data);
+
+
+        $response->assertRedirect(route('courses.edit', [$this->courseOne->id]));
+
+        $this->assertDatabaseHas('courses', ["title" => "Test Course", "abbreviation" => "Test 442",
+                                             "description" => "Some random description", "credits" => 2]);
+
+        $this->courseOne->refresh();
+
+        $this->assertTrue(in_array($this->courseTwo->id, $this->courseOne->concurrents));
+        $this->assertTrue(in_array($this->courseThree->id, $this->courseOne->prerequisites));
+
+        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 2]);
+        $this->assertDatabaseHas('course_professor', ['course_id' => $this->courseOne->id,
+                                                      'professor_id' => Professor::first()->id]);
     }
 
     /**  @test */
@@ -603,6 +678,26 @@ class CourseTest extends TestCase
     }
 
     /**  @test */
+    public function dev_auth_user_can_not_update_a_course_with_invalid_professors_choice()
+    {
+
+        $data = [
+            "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
+            "credits" => 0, "semester" => [4], "prerequisites" => [1], "professors" => [2121021]
+        ];
+
+        $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseOne->id]))
+                         ->put(route('courses.update', [$this->courseOne->id]), $data);
+
+
+        $response->assertRedirect(route('courses.edit', [$this->courseOne->id]));
+        $response->assertSessionHasErrorsIn('professors');
+        $this->assertDatabaseMissing('course_professor', ["course_id" => $this->courseOne->id,
+            "professor_id" => 2121021]);
+
+    }
+
+    /**  @test */
     public function regular_auth_user_can_not_update_a_course()
     {
 
@@ -663,6 +758,23 @@ class CourseTest extends TestCase
         $this->assertDatabaseMissing('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 1]);
         $this->assertDatabaseMissing('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 2]);
         $this->assertDatabaseHas('courses', ['id' => $this->courseTwo->id, 'prerequisites' => null]);
+    }
+
+    /**  @test */
+    public function when_dev_auth_user_deletes_a_course_it_is_removed_from_the_course_professor_table()
+    {
+
+        $this->courseOne->professors()->attach(Professor::first()->id);
+
+        $response = $this->actingAs($this->devUser)
+                         ->delete(route('courses.destroy', [$this->courseOne->id]));
+
+        $response->assertRedirect(route('courses.index'));
+        $this->assertDatabaseMissing('courses', ["id" => $this->courseOne->id]);
+        $this->assertDatabaseMissing('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 1]);
+        $this->assertDatabaseMissing('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 2]);
+        $this->assertDatabaseMissing('course_professor', ['professor_id' => Professor::first()->id,
+                                                          "course_id" => $this->courseOne->id]);
     }
 
 

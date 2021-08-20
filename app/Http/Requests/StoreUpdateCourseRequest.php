@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Course;
+use App\Models\Professor;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -57,6 +58,10 @@ class StoreUpdateCourseRequest extends FormRequest
                 'nullable',
                 Rule::in(Course::getCourseIDs()),
             ],
+            'professors.*' => [
+                'nullable',
+                Rule::in(Professor::getProfessorIDs()),
+            ],
         ];
     }
 
@@ -76,6 +81,12 @@ class StoreUpdateCourseRequest extends FormRequest
         if ($this->missing('concurrents')) {
             $this->merge([
                 'concurrents' => null
+            ]);
+        }
+
+        if ($this->missing('professors')) {
+            $this->merge([
+                'professors' => null
             ]);
         }
 
