@@ -20,4 +20,13 @@ class Professor extends Model
         return $this->belongsToMany(Course::class);
     }
 
+    /**
+     * Helpers
+     */
+    public static function getProfessorIDs()
+    {
+        return Professor::all()->pluck('id')->toArray();
+    }
+
+
 }

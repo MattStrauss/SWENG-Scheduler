@@ -51,6 +51,17 @@
         </select>
     </div>
     <div class="w-full md:w-2/5 px-3 mb-6 md:mb-0">
+        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-prerequisites">
+            Professors
+        </label>
+        <select name="professors[]" multiple class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-prerequisites">
+            <option></option>
+            @foreach($professors as $professor)
+                <option @if(in_array($professor->id, $course->professors->pluck('id')->toArray() ?? [])) selected @endif value="{{$professor->id}}">{{$professor->name}}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="w-full md:w-2/5 px-3 mb-6 md:mb-0">
         <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-concurrents">
             Concurrents
         </label>
