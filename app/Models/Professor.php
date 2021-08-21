@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\Votable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Professor extends Model
 {
-    use HasFactory;
+    use HasFactory, Votable;
 
     protected $fillable = ['name'];
 
@@ -27,6 +28,5 @@ class Professor extends Model
     {
         return Professor::all()->pluck('id')->toArray();
     }
-
 
 }

@@ -43,6 +43,12 @@ Route::middleware(['verified', 'auth'])->group(function () {
     Route::get('/home', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
 
+    // Voting
+    Route::post('professors/{professor}/votes', [\App\Http\Controllers\VoteController::class, 'store'])
+        ->name('professors.vote');
+    Route::post('courses/{course}/votes', [\App\Http\Controllers\VoteController::class, 'store'])
+         ->name('courses.vote');
+
     Route::resource('courses', \App\Http\Controllers\CourseController::class);
 
     Route::get('/mark-completed',
