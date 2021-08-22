@@ -60,6 +60,21 @@
             @endforeach
         @endif
 
+        <h4><strong>Prerequisite for</strong> </h4>
+            @if(\App\Models\Course::isPrerequisiteFor($course)->isNotEmpty())
+
+                @foreach(\App\Models\Course::isPrerequisiteFor($course) as $course)
+                    @if (! $loop->last)
+                        {{$course->abbreviation}},
+                    @else
+                        {{$course->abbreviation}}
+                    @endif
+                @endforeach
+
+            @else
+                None
+            @endif
+
     </div>
 
 @endsection

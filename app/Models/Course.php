@@ -71,6 +71,11 @@ class Course extends Model
         })->get();
     }
 
+    public static function isPrerequisiteFor($course)
+    {
+       return Course::whereJsonContains('prerequisites', (string) $course->id)->get();
+    }
+
     public static function getCoursesWithConcurrents($semester)
     {
         return Course::whereNotNull('concurrents')->whereHas('semesters', function (Builder $query) use ($semester) {
