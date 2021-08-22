@@ -20,6 +20,11 @@ class Professor extends Model
         return $this->belongsToMany(Course::class);
     }
 
+    public function polls()
+    {
+        return $this->morphMany(Poll::class, 'pollable');
+    }
+
     /**
      * Helpers
      */
