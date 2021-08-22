@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreUpdateCourseRequest;
 use App\Models\Course;
 use App\Models\Professor;
+use App\Models\Semester;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -170,7 +171,7 @@ class CourseController extends Controller
         // find and add any available concurrent courses based on suggested courses above
         $suggestedCourses =
             $this->addCoursesThatCanBeRecommendedAsConcurrent($suggestedCourses, $semester)
-                 ->take($requestedNumberOfCourses);
+                 ;
 
         $warnings = $this->getConcurrentWarnings($suggestedCourses, $semester);
 
@@ -178,8 +179,11 @@ class CourseController extends Controller
            $this->lessThanExpectedCoursesWarning($warnings);
         }
 
+        $semesterName = Semester::find($semester)->name;
+
         return view('recommendations.show',
-            compact('pageName', 'suggestedCourses', 'warnings', 'semester', 'requestedNumberOfCourses'));
+            compact('pageName', 'suggestedCourses', 'warnings', 'semesterName',
+                'requestedNumberOfCourses'));
 
     }
 

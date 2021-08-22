@@ -22,9 +22,9 @@
         @endif
 
         <div class="px-3 pt-2 pb-5">
-            <p class="font-medium text-lg">Course Recommendations for
-                <strong>{{\App\Models\Semester::find($semester)->name}} </strong> semester
-                with <strong>{{$requestedNumberOfCourses}} </strong> courses: </p>
+            <p class="font-medium text-2xl">Course Recommendations for <span class="bold text-blue-900 underline">
+                {{$semesterName}}</span> semester with
+                <span class="bold text-blue-900 underline">{{$requestedNumberOfCourses}}</span> courses: </p>
         </div>
 
 
@@ -34,24 +34,41 @@
 
         @else
 
-            <div class="text-gray-700 grid grid-cols-2 gap-6">
+            <div class="text-xl p-2 -mb-1 semibold">Recommended Courses</div>
+
+            <div class="text-gray-700 grid sm:grid-cols-2 gap-6 mb-8 p-3 border-dashed border-2 rounded">
+
 
                 @foreach($suggestedCourses as $course)
 
-                    <div class="leading-relaxed p-4 rounded bg-gray-50">
-                        <h4><strong>Title</strong>:
-                            <a class="underline font-medium hover:no-underline" href="{{route('courses.show', $course->id)}}">
-                                {{$course->title}} - {{$course->abbreviation}}
-                            </a>
-                        </h4>
-                        <p><strong>Credits</strong>: {{$course->credits}}</p>
-                    </div>
+                    @include('recommendations.partials.recommended-course-list')
+
+                    @if ($loop->iteration == $requestedNumberOfCourses) @break @endif
 
                 @endforeach
+
             </div>
 
-        @endif
+            @if($suggestedCourses->count() > $requestedNumberOfCourses)
 
+                <div class="text-xl p-2 -mb-1 semibold">Alternative Options </div>
+                <div class="text-gray-700 grid sm:grid-cols-2 gap-6 mb-8 p-3 border-dashed border-2 rounded">
+
+                    @foreach($suggestedCourses as $course)
+
+                        @if ($loop->iteration <= $requestedNumberOfCourses) @continue @endif
+
+                        @include('recommendations.partials.recommended-course-list')
+
+                        @if ($loop->iteration == $requestedNumberOfCourses) @break @endif
+
+                    @endforeach
+
+                </div>
+
+            @endif
+
+        @endif
 
     </div>
 
