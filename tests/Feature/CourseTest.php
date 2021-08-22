@@ -74,6 +74,30 @@ class CourseTest extends TestCase
     }
 
     /**  @test */
+    public function nev_auth_user_can_visit_courses_show()
+    {
+        $response = $this->actingAs($this->devUser)->get(route('courses.show', Course::all()->first()->id));
+
+        $response->assertSuccessful();
+    }
+
+    /**  @test */
+    public function non_dev_auth_user_can_visit_courses_show()
+    {
+        $response = $this->actingAs($this->regularUser)->get(route('courses.show', Course::all()->first()->id));
+
+        $response->assertSuccessful();
+    }
+
+    /**  @test */
+    public function guest_can_not_visit_courses_show()
+    {
+        $response = $this->get(route('courses.show', Course::all()->first()->id));
+
+        $response->assertRedirect(route('login'));
+    }
+
+    /**  @test */
     public function dev_auth_user_can_visit_create_course()
     {
         $response = $this->actingAs($this->devUser)->get(route('courses.create', Course::all()->first()->id));
