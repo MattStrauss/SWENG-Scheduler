@@ -85,7 +85,7 @@ class Course extends Model
 
     public static function removeDeletedCourseFromPrerequisites($course_id)
     {
-        Course::whereJsonContains('prerequisites', (string) $course_id)->each(function ($item) use ($course_id) {
+        Course::whereJsonContains('prerequisites', $course_id)->each(function ($item) use ($course_id) {
 
             $newPrerequisites = array_values(array_diff($item->prerequisites, [$course_id]));
 
