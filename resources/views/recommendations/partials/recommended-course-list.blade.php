@@ -11,15 +11,19 @@
     @endif
 
 
-    @if(\App\Models\Course::isPrerequisiteFor($course)->isNotEmpty())
-        <p><strong>Prerequisite for</strong>:
-            @foreach(\App\Models\Course::isPrerequisiteFor($course) as $course)
-                @if (! $loop->last)
-                    {{$course->abbreviation}},
-                @else
-                    {{$course->abbreviation}}
-                @endif
-            @endforeach
-        </p>
-    @endif
+    <p><strong>Prerequisite for</strong>:
+        @if(\App\Models\Course::isPrerequisiteFor($course)->isNotEmpty())
+
+                @foreach(\App\Models\Course::isPrerequisiteFor($course) as $course)
+                    @if (! $loop->last)
+                        {{$course->abbreviation}},
+                    @else
+                        {{$course->abbreviation}}
+                    @endif
+                @endforeach
+
+        @else
+            None
+        @endif
+    </p>
 </div>

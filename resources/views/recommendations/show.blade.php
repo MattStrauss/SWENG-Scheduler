@@ -34,7 +34,7 @@
 
         @else
 
-            <div class="text-xl p-2 -mb-1 semibold">Recommended Courses</div>
+            <div class="text-xl p-2 -mb-1 semibold uppercase">Recommended Courses</div>
 
             <div class="text-gray-700 grid sm:grid-cols-2 gap-6 mb-8 p-3 border-dashed border-2 rounded">
 
@@ -51,7 +51,7 @@
 
             @if($suggestedCourses->count() > $requestedNumberOfCourses)
 
-                <div class="text-xl p-2 -mb-1 semibold">Alternative Options </div>
+                <div class="text-xl p-2 -mb-1 semibold uppercase">Alternative Options </div>
                 <div class="text-gray-700 grid sm:grid-cols-2 gap-6 mb-8 p-3 border-dashed border-2 rounded">
 
                     @foreach($suggestedCourses as $course)
