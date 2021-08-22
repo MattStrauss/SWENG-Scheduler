@@ -93,16 +93,16 @@ class CourseSeeder extends Seeder
 
 
         foreach(Course::all() as $course) {
-            // semesters (random)
-            $semester = Text::randomElements([1, 2, 3], rand(1, 3));
-            $course->semesters()->attach([1, 2, 3]);
+            // All courses available in all semesters, except SWENG 480 and SWENG 481
+            if ($course->abbreviation == "SWENG 480" || $course->abbreviation == "SWENG 481" ) {
+                $course->semesters()->attach(($course->abbreviation == "SWENG 480") ? 1 : 2);
+                $course->update(['semester_specific' => 1]);
+            } else {
+                $course->semesters()->attach([1, 2, 3]);
+            }
 
             // fill prerequisites_for_count field
             $course->update(['prerequisites_for_count' => Course::whereJsonContains('prerequisites', (string) $course->id )->count()]);
-
-            if (rand(0,99) % 7 == 0) {
-                $course->update(['semester_specific' => 1]);
-            }
         }
 
     }
