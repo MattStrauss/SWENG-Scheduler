@@ -3496,7 +3496,7 @@ var Navigation = /*#__PURE__*/function (_React$Component) {
     _this = _super.call(this, props);
     var navItems = JSON.parse(_this.props.nav);
 
-    if (!_this.props.isSuperUser) {
+    if (!JSON.parse(_this.props.isSuperUser)) {
       navItems.pop();
     }
 

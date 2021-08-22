@@ -7,7 +7,7 @@ class Navigation extends React.Component {
         super(props);
 
         const navItems = JSON.parse(this.props.nav);
-        if (! this.props.isSuperUser) {
+        if (! JSON.parse(this.props.isSuperUser)) {
             navItems.pop();
         }
 
