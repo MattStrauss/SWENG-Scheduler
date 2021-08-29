@@ -20,4 +20,13 @@ class Semester extends Model
         return $this->belongsToMany(Course::class);
     }
 
+    /**
+     * Helpers
+     */
+    public static function getSemesterIDs()
+    {
+        return Semester::all()->pluck('id')->toArray();
+    }
+
+
 }
