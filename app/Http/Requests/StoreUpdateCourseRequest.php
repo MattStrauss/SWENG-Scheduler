@@ -41,6 +41,7 @@ class StoreUpdateCourseRequest extends FormRequest
             ],
             'type' => 'required',
             'description' => 'required|max:400',
+            'programming_language' => 'nullable|max:30',
             'credits' => [
                 'required',
                 Rule::in(['1', '2', '3', '4']),

@@ -8,7 +8,6 @@ use App\Models\Semester;
 use App\Models\User;
 use Database\Seeders\ProfessorSeeder;
 use Database\Seeders\SemesterSeeder;
-use Database\Seeders\TestingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -22,6 +21,13 @@ class CourseTest extends TestCase
     private $courseOne;
     private $courseTwo;
     private $courseThree;
+    private $semesterOne;
+    private $semesterTwo;
+    private $semesterThree;
+    private $professorOne;
+    private $professorTwo;
+    private $professorThree;
+
 
     protected function setUp(): void
     {
@@ -29,6 +35,20 @@ class CourseTest extends TestCase
 
         $this->seed(SemesterSeeder::class);
         $this->seed(ProfessorSeeder::class);
+
+        $this->semesterOne = Semester::factory()->create(['name' => 'Fall']);
+        $this->semesterOne = Semester::factory()->create(['name' => 'Spring']);
+        $this->semesterOne = Semester::factory()->create(['name' => 'Summer']);
+
+        $this->semesterOne = Semester::factory()->create(['name' => 'Fall']);
+        $this->semesterOne = Semester::factory()->create(['name' => 'Spring']);
+        $this->semesterOne = Semester::factory()->create(['name' => 'Summer']);
+
+        $this->professorOne = Professor::factory()->create(['name' => 'Lauren Bello']);
+        $this->professorTwo = Professor::factory()->create(['name' => 'Ahmed Sammoud']);
+        $this->professorThree = Professor::factory()->create(['name' => 'Seunghoon Bang']);
+
+
 
         $this->devUser = User::factory()->create(['name' => 'Ava Dev', 'email' => 'ava@psu.edu']);
         $this->regularUser = User::factory()->create(['name' => 'Eli User', 'email' => 'eli@psu.edu']);
@@ -151,7 +171,8 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2], "professors" => [Professor::where('name', 'Seunghoon Bang')->first()->id]
+            "credits" => 2, "semester" => [1,2], "professors" => [Professor::where('name', 'Seunghoon Bang')->first()->id,
+            'programming_language' => "PHP"]
         ];
 
         $response = $this->actingAs($this->devUser)->post(route('courses.store', $data));
@@ -160,7 +181,8 @@ class CourseTest extends TestCase
 
         $response->assertRedirect(route('courses.index'));
         $this->assertDatabaseHas('courses', ["title" => "Test Course", "abbreviation" => "Test 442",
-                                             "description" => "Some random description", "credits" => 2,]);
+                                             "description" => "Some random description", "credits" => 2,
+                                                "programming_language" => "PHP"]);
         $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 1]);
         $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 2]);
         $this->assertDatabaseHas('course_professor',
