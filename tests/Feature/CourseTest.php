@@ -678,7 +678,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 0, "semester" => [4], "concurrents" => [100]
+            "credits" => 0, "semester" => [$this->semesterThree->id], "concurrents" => [100]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseOne->id]))
@@ -699,7 +699,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 0, "semester" => [4], "prerequisites" => [100]
+            "credits" => 0, "semester" => [$this->semesterThree->id], "prerequisites" => [100]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseOne->id]))
@@ -720,7 +720,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 0, "semester" => [4], "prerequisites" => [1], "professors" => [2121021]
+            "credits" => 0, "semester" => [$this->semesterTwo->id], "prerequisites" => [1], "professors" => [2121021]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseOne->id]))
