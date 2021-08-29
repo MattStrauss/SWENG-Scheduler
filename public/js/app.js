@@ -2571,7 +2571,7 @@ function CourseInspector(props) {
     } else {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
         className: "related-course-row text-gray-700"
-      }, "Unkown");
+      }, "Unknown");
     }
   };
 
@@ -2593,7 +2593,13 @@ function CourseInspector(props) {
     className: "inspector-data-label text-gray-500"
   }, "Title:"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "inspector-data-value text-gray-700"
-  }, props.selectedCourse ? props.selectedCourse.title : "")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  }, props.selectedCourse ? props.selectedCourse.title : "")), props.selectedCourse && props.selectedCourse.programming_language && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "inspector-row grid grid-cols2 gap-2"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "inspector-data-label text-gray-500"
+  }, "Programming Language(s):"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "inspector-data-value text-gray-700"
+  }, props.selectedCourse.programming_language)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "inspector-row grid grid-cols2 gap-2"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "inspector-data-label text-gray-500"
