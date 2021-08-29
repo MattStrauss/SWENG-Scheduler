@@ -8,7 +8,6 @@ use App\Models\Semester;
 use App\Models\User;
 use Database\Seeders\ProfessorSeeder;
 use Database\Seeders\SemesterSeeder;
-use Database\Seeders\TestingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -22,31 +21,46 @@ class CourseTest extends TestCase
     private $courseOne;
     private $courseTwo;
     private $courseThree;
+    private $semesterOne;
+    private $semesterTwo;
+    private $semesterThree;
+    private $professorOne;
+    private $professorTwo;
+    private $professorThree;
+
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(SemesterSeeder::class);
-        $this->seed(ProfessorSeeder::class);
+//        $this->seed(SemesterSeeder::class);
+//        $this->seed(ProfessorSeeder::class);
+
+        $this->semesterOne = Semester::factory()->create(['name' => 'Fall']);
+        $this->semesterTwo = Semester::factory()->create(['name' => 'Spring']);
+        $this->semesterThree = Semester::factory()->create(['name' => 'Summer']);
+
+        $this->professorOne = Professor::factory()->create(['name' => 'Prof One']);
+        $this->professorTwo = Professor::factory()->create(['name' => 'Prof Two']);
+        $this->professorThree = Professor::factory()->create(['name' => 'Prof Three']);
 
         $this->devUser = User::factory()->create(['name' => 'Ava Dev', 'email' => 'ava@psu.edu']);
         $this->regularUser = User::factory()->create(['name' => 'Eli User', 'email' => 'eli@psu.edu']);
 
         $this->courseOne = Course::factory()->create(
             ['title' => 'Test Course One', 'abbreviation' => 'Test 221', 'type' => 'Test']);
-        $this->courseOne->semesters()->attach([1, 2]);
-        $this->courseOne->professors()->attach(Professor::where('name', 'Lauren Bello')->first()->id);
+        $this->courseOne->semesters()->attach([$this->semesterOne->id, $this->semesterTwo->id]);
+        $this->courseOne->professors()->attach($this->professorOne->id);
 
         $this->courseTwo = Course::factory()->create(
             ['title' => 'Test Course Two', 'abbreviation' => 'Test 311', 'type' => 'Test']);
-        $this->courseTwo->semesters()->attach([2]);
-        $this->courseTwo->professors()->attach(Professor::where('name', 'Ahmed Sammoud')->first()->id);
+        $this->courseTwo->semesters()->attach($this->semesterTwo->id);
+        $this->courseTwo->professors()->attach($this->professorTwo->id);
 
         $this->courseThree = Course::factory()->create(
             ['title' => 'Test Course Three', 'abbreviation' => 'Test 432', 'type' => 'Test']);
-        $this->courseThree->semesters()->attach([2, 3]);
-        $this->courseThree->professors()->attach(Professor::where('name', 'Seunghoon Bang')->first()->id);
+        $this->courseThree->semesters()->attach([$this->semesterTwo->id, $this->semesterThree->id]);
+        $this->courseThree->professors()->attach($this->professorThree->id);
     }
 
     /**  @test */
@@ -74,7 +88,7 @@ class CourseTest extends TestCase
     }
 
     /**  @test */
-    public function nev_auth_user_can_visit_courses_show()
+    public function dev_auth_user_can_visit_courses_show()
     {
         $response = $this->actingAs($this->devUser)->get(route('courses.show', Course::all()->first()->id));
 
@@ -151,7 +165,8 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2], "professors" => [Professor::where('name', 'Seunghoon Bang')->first()->id]
+            "credits" => 2, "semester" => [$this->semesterOne->id, $this->semesterTwo->id],
+            "professors" => [$this->professorOne->id], 'programming_language' => "PHP"
         ];
 
         $response = $this->actingAs($this->devUser)->post(route('courses.store', $data));
@@ -160,11 +175,12 @@ class CourseTest extends TestCase
 
         $response->assertRedirect(route('courses.index'));
         $this->assertDatabaseHas('courses', ["title" => "Test Course", "abbreviation" => "Test 442",
-                                             "description" => "Some random description", "credits" => 2,]);
-        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 1]);
-        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 2]);
+                                             "description" => "Some random description", "credits" => 2,
+                                                "programming_language" => "PHP"]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => $this->semesterOne->id]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => $this->semesterTwo->id]);
         $this->assertDatabaseHas('course_professor',
-            ['course_id' => $newCourse->id, 'professor_id' => Professor::where('name', 'Seunghoon Bang')->first()->id]);
+            ['course_id' => $newCourse->id, 'professor_id' => $this->professorOne->id]);
     }
 
     /**  @test */
@@ -173,8 +189,8 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2], "prerequisites" => [$this->courseOne->id],
-            "professors" => [Professor::where('name', 'Eugene Walters')->first()->id]
+            "credits" => 2, "semester" => [$this->semesterOne->id, $this->semesterTwo->id], "prerequisites" => [$this->courseOne->id],
+            "professors" => [$this->professorOne->id]
         ];
 
         $response = $this->actingAs($this->devUser)->post(route('courses.store', $data));
@@ -189,10 +205,10 @@ class CourseTest extends TestCase
         $this->assertFalse(in_array($this->courseTwo->id, $newCourse->prerequisites));
         $this->assertFalse(in_array($this->courseThree->id, $newCourse->prerequisites));
 
-        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 1]);
-        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 2]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => $this->semesterOne->id]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => $this->semesterTwo->id]);
         $this->assertDatabaseHas('course_professor',
-            ['course_id' => $newCourse->id, 'professor_id' => Professor::where('name', 'Eugene Walters')->first()->id]);
+            ['course_id' => $newCourse->id, 'professor_id' => $this->professorOne->id]);
     }
 
 
@@ -201,9 +217,8 @@ class CourseTest extends TestCase
     {
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2], "concurrents" => [$this->courseOne->id],
-            "professors" => [Professor::where('name', 'Eugene Walters')->first()->id,
-                Professor::where('name', 'Joseph Houck')->first()->id]
+            "credits" => 2, "semester" => [$this->semesterOne->id,$this->semesterTwo->id], "concurrents" => [$this->courseOne->id],
+            "professors" => [$this->professorOne->id, $this->professorTwo->id]
         ];
 
         $response = $this->actingAs($this->devUser)->post(route('courses.store', $data));
@@ -219,12 +234,12 @@ class CourseTest extends TestCase
         $this->assertFalse(in_array($this->courseThree->id, $newCourse->concurrents));
 
 
-        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 1]);
-        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 2]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => $this->semesterOne->id]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => $this->semesterTwo->id]);
         $this->assertDatabaseHas('course_professor',
-            ['course_id' => $newCourse->id, 'professor_id' => Professor::where('name', 'Eugene Walters')->first()->id]);
+            ['course_id' => $newCourse->id, 'professor_id' => $this->professorOne->id]);
         $this->assertDatabaseHas('course_professor',
-            ['course_id' => $newCourse->id, 'professor_id' => Professor::where('name', 'Joseph Houck')->first()->id]);
+            ['course_id' => $newCourse->id, 'professor_id' => $this->professorTwo->id]);
     }
 
     /**  @test */
@@ -233,10 +248,9 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2], "concurrents" => [$this->courseOne->id],
+            "credits" => 2, "semester" => [$this->semesterOne->id, $this->semesterTwo->id], "concurrents" => [$this->courseOne->id],
             "prerequisites" => [$this->courseTwo->id, $this->courseThree->id],
-            "professors" => [Professor::where('name', 'Ahmed Sammoud')->first()->id,
-                Professor::where('name', 'Meng Su')->first()->id]
+            "professors" => [$this->professorThree->id, $this->professorTwo->id]
         ];
 
         $response = $this->actingAs($this->devUser)->post(route('courses.store', $data));
@@ -253,12 +267,12 @@ class CourseTest extends TestCase
         $this->assertFalse(in_array($this->courseTwo->id, $newCourse->concurrents));
         $this->assertFalse(in_array($this->courseOne->id, $newCourse->prerequisites));
 
-        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 1]);
-        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => 2]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => $this->semesterOne->id]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $newCourse->id, 'semester_id' => $this->semesterTwo->id]);
         $this->assertDatabaseHas('course_professor',
-            ['course_id' => $newCourse->id, 'professor_id' => Professor::where('name', 'Ahmed Sammoud')->first()->id]);
+            ['course_id' => $newCourse->id, 'professor_id' => $this->professorThree->id]);
         $this->assertDatabaseHas('course_professor',
-            ['course_id' => $newCourse->id, 'professor_id' => Professor::where('name', 'Meng Su')->first()->id]);
+            ['course_id' => $newCourse->id, 'professor_id' => $this->professorTwo->id]);
     }
 
 
@@ -268,7 +282,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => $this->courseOne->title, "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2], "concurrents" => [$this->courseOne->id]
+            "credits" => 2, "semester" => [$this->semesterOne->id, $this->semesterTwo->id], "concurrents" => [$this->courseOne->id]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.create'))
@@ -288,7 +302,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => $this->courseOne->abbreviation, "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2], "concurrents" => [$this->courseOne->id]
+            "credits" => 2, "semester" => [$this->semesterOne->id, $this->semesterTwo->id], "concurrents" => [$this->courseOne->id]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.create'))
@@ -308,7 +322,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "",
-            "credits" => 2, "semester" => [1,2], "concurrents" => [$this->courseOne->id]
+            "credits" => 2, "semester" => [$this->semesterOne->id, $this->semesterTwo->id], "concurrents" => [$this->courseOne->id]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.create'))
@@ -328,7 +342,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 0, "semester" => [1,2], "concurrents" => [$this->courseOne->id]
+            "credits" => 0, "semester" => [$this->semesterOne->id, $this->semesterTwo->id], "concurrents" => [$this->courseOne->id]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.create'))
@@ -348,7 +362,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 0, "semester" => [4], "concurrents" => [$this->courseOne->id]
+            "credits" => 0, "semester" => [Semester::first()->id - 1], "concurrents" => [$this->courseOne->id]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.create'))
@@ -368,7 +382,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 0, "semester" => [4], "concurrents" => [100]
+            "credits" => 0, "semester" => [$this->semesterTwo->id], "concurrents" => [100]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.create'))
@@ -388,7 +402,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 0, "semester" => [2], "prerequisites" => [100]
+            "credits" => 0, "semester" => [$this->semesterTwo->id], "prerequisites" => [100]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.create'))
@@ -408,7 +422,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 0, "semester" => [2], "prerequisites" => [4], "professors" => [10000001]
+            "credits" => 0, "semester" => [$this->semesterTwo->id], "professors" => [10000001]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.create'))
@@ -426,7 +440,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2]
+            "credits" => 2, "semester" => [$this->semesterOne->id]
         ];
 
         $response = $this->actingAs($this->regularUser)->post(route('courses.store', $data));
@@ -442,7 +456,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2]
+            "credits" => 2, "semester" => [$this->semesterThree->id]
         ];
 
         $response = $this->post(route('courses.store', $data));
@@ -458,7 +472,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2]
+            "credits" => 2, "semester" => [$this->semesterOne->id, $this->semesterTwo->id], 'programming_language' => "C#"
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseOne->id]))
@@ -467,9 +481,9 @@ class CourseTest extends TestCase
         $response->assertRedirect(route('courses.edit', [$this->courseOne->id]));
         $this->assertDatabaseHas('courses', ["id" => $this->courseOne->id, "title" => "Test Course",
                                              "abbreviation" => "Test 442", "description" => "Some random description",
-                                             "credits" => 2,]);
-        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 1]);
-        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 2]);
+                                             "credits" => 2, 'programming_language' => "C#"]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => $this->semesterOne->id]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => $this->semesterTwo->id]);
     }
 
     /**  @test */
@@ -478,7 +492,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2], "prerequisites" => [(string) $this->courseOne->id]
+            "credits" => 2, "semester" => [$this->semesterOne->id], "prerequisites" => [(string) $this->courseOne->id]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseTwo->id]))
@@ -495,8 +509,7 @@ class CourseTest extends TestCase
         $this->assertTrue(in_array($this->courseOne->id, $this->courseTwo->prerequisites));
         $this->assertFalse(in_array($this->courseThree->id, $this->courseTwo->prerequisites));
 
-        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseTwo->id, 'semester_id' => 1]);
-        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseTwo->id, 'semester_id' => 2]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseTwo->id, 'semester_id' => $this->semesterOne->id ]);
     }
 
     /**  @test */
@@ -505,7 +518,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [2], "concurrents" => [(string) $this->courseTwo->id],
+            "credits" => 2, "semester" => [$this->semesterTwo->id], "concurrents" => [(string) $this->courseTwo->id],
             "prerequisites" => [(string) $this->courseThree->id]
         ];
 
@@ -523,7 +536,7 @@ class CourseTest extends TestCase
         $this->assertTrue(in_array($this->courseTwo->id, $this->courseOne->concurrents));
         $this->assertTrue(in_array($this->courseThree->id, $this->courseOne->prerequisites));
 
-        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 2]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => $this->semesterTwo->id]);
     }
 
     /**  @test */
@@ -532,7 +545,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [2], "concurrents" => [(string) $this->courseTwo->id],
+            "credits" => 2, "semester" => [$this->semesterTwo->id], "concurrents" => [(string) $this->courseTwo->id],
             "prerequisites" => [(string) $this->courseThree->id], "professors" => [Professor::first()->id]
         ];
 
@@ -550,7 +563,7 @@ class CourseTest extends TestCase
         $this->assertTrue(in_array($this->courseTwo->id, $this->courseOne->concurrents));
         $this->assertTrue(in_array($this->courseThree->id, $this->courseOne->prerequisites));
 
-        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 2]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => $this->semesterTwo->id]);
         $this->assertDatabaseHas('course_professor', ['course_id' => $this->courseOne->id,
                                                       'professor_id' => Professor::first()->id]);
     }
@@ -561,7 +574,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => $this->courseTwo->title, "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2], "prerequisites" => [(string) $this->courseTwo->id]
+            "credits" => 2, "semester" => [$this->semesterTwo->id], "prerequisites" => [(string) $this->courseTwo->id]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseOne->id]))
@@ -582,7 +595,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => $this->courseTwo->abbreviation, "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2], "prerequisites" => [(string) $this->courseTwo->id]
+            "credits" => 2, "semester" => [$this->semesterThree->id], "prerequisites" => [(string) $this->courseTwo->id]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseOne->id]))
@@ -603,7 +616,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "",
-            "credits" => 2, "semester" => [1,2], "prerequisites" => [(string) $this->courseTwo->id]
+            "credits" => 2, "semester" => [$this->semesterTwo->id], "prerequisites" => [(string) $this->courseTwo->id]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseOne->id]))
@@ -623,7 +636,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 0, "semester" => [1,2], "prerequisites" => [(string) $this->courseTwo->id]
+            "credits" => 0, "semester" => [$this->semesterThree->id], "prerequisites" => [(string) $this->courseTwo->id]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseOne->id]))
@@ -644,7 +657,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 0, "semester" => [4], "prerequisites" => [(string) $this->courseTwo->id]
+            "credits" => 0, "semester" => [Semester::first()-> id - 1], "prerequisites" => [(string) $this->courseTwo->id]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseOne->id]))
@@ -665,7 +678,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 0, "semester" => [4], "concurrents" => [100]
+            "credits" => 0, "semester" => [$this->semesterThree->id], "concurrents" => [100]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseOne->id]))
@@ -686,7 +699,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 0, "semester" => [4], "prerequisites" => [100]
+            "credits" => 0, "semester" => [$this->semesterThree->id], "prerequisites" => [100]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseOne->id]))
@@ -707,7 +720,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 0, "semester" => [4], "prerequisites" => [1], "professors" => [2121021]
+            "credits" => 0, "semester" => [$this->semesterTwo->id], "prerequisites" => [1], "professors" => [2121021]
         ];
 
         $response = $this->actingAs($this->devUser)->from(route('courses.edit', [$this->courseOne->id]))
@@ -727,7 +740,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2]
+            "credits" => 2, "semester" => [$this->semesterOne->id, $this->semesterTwo->id]
         ];
 
         $response = $this->actingAs($this->regularUser)->put(route('courses.update', [$this->courseOne->id]), $data);
@@ -744,7 +757,7 @@ class CourseTest extends TestCase
 
         $data = [
             "title" => "Test Course", "abbreviation" => "Test 442", "description" => "Some random description",
-            "credits" => 2, "semester" => [1,2]
+            "credits" => 2, "semester" => [$this->semesterOne->id, $this->semesterTwo->id]
         ];
 
         $response = $this->put(route('courses.update', [$this->courseOne->id]), $data);
@@ -779,8 +792,8 @@ class CourseTest extends TestCase
 
         $response->assertRedirect(route('courses.index'));
         $this->assertDatabaseMissing('courses', ["id" => $this->courseOne->id]);
-        $this->assertDatabaseMissing('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 1]);
-        $this->assertDatabaseMissing('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 2]);
+        $this->assertDatabaseMissing('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => $this->semesterOne->id]);
+        $this->assertDatabaseMissing('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => $this->semesterTwo->id]);
         $this->assertDatabaseHas('courses', ['id' => $this->courseTwo->id, 'prerequisites' => null]);
     }
 
@@ -795,9 +808,9 @@ class CourseTest extends TestCase
 
         $response->assertRedirect(route('courses.index'));
         $this->assertDatabaseMissing('courses', ["id" => $this->courseOne->id]);
-        $this->assertDatabaseMissing('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 1]);
-        $this->assertDatabaseMissing('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 2]);
-        $this->assertDatabaseMissing('course_professor', ['professor_id' => Professor::first()->id,
+        $this->assertDatabaseMissing('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => $this->semesterOne->id]);
+        $this->assertDatabaseMissing('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => $this->semesterTwo->id]);
+        $this->assertDatabaseMissing('course_professor', ['professor_id' => $this->professorOne->id,
                                                           "course_id" => $this->courseOne->id]);
     }
 
@@ -811,8 +824,8 @@ class CourseTest extends TestCase
 
         $response->assertForbidden();
         $this->assertDatabaseHas('courses', ["id" => $this->courseOne->id]);
-        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 1]);
-        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 2]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => $this->semesterOne->id]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => $this->semesterTwo->id]);
     }
 
     /**  @test */
@@ -823,8 +836,8 @@ class CourseTest extends TestCase
 
         $response->assertRedirect(route('login'));
         $this->assertDatabaseHas('courses', ["id" => $this->courseOne->id]);
-        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 1]);
-        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => 2]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => $this->semesterOne->id]);
+        $this->assertDatabaseHas('course_semester', ['course_id' => $this->courseOne->id, 'semester_id' => $this->semesterTwo->id]);
     }
 
 }

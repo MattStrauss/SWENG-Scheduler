@@ -16,7 +16,7 @@ class Course extends Model
      * @var array
      */
     protected $fillable = ["title", "description", "credits", "type", "abbreviation", 'prerequisites', 'concurrents',
-                            'prerequisites_for_count', 'semester_specific'];
+                            'prerequisites_for_count', 'semester_specific', 'programming_language'];
 
     /**
      * The relationships that should always be loaded.

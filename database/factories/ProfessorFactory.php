@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\Semester;
+use App\Models\Professor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class SemesterFactory extends Factory
+class ProfessorFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Semester::class;
+    protected $model = Professor::class;
 
     /**
      * Define the model's default state.
@@ -22,7 +22,7 @@ class SemesterFactory extends Factory
     public function definition()
     {
         return [
-            "name" => $this->faker->randomElement(["Spring", "Fall", "Summer"]),
+            "name" => $this->faker->name,
         ];
     }
 }

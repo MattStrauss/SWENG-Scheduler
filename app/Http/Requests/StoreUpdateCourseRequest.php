@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Course;
 use App\Models\Professor;
+use App\Models\Semester;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -41,6 +42,7 @@ class StoreUpdateCourseRequest extends FormRequest
             ],
             'type' => 'required',
             'description' => 'required|max:400',
+            'programming_language' => 'nullable|max:30',
             'credits' => [
                 'required',
                 Rule::in(['1', '2', '3', '4']),
@@ -48,7 +50,7 @@ class StoreUpdateCourseRequest extends FormRequest
             'semester' => 'required',
             'semester.*' => [
                 'required',
-                Rule::in(['1', '2', '3']),
+                Rule::in(Semester::getSemesterIDs()),
             ],
             'prerequisites.*' => [
                 'nullable',

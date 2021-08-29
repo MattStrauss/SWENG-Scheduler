@@ -110,7 +110,7 @@ function CourseInspector(props) {
                 );
             });
         } else {
-            return <div className="related-course-row text-gray-700">Unkown</div>
+            return <div className="related-course-row text-gray-700">Unknown</div>
         }
     };
 
@@ -135,6 +135,16 @@ function CourseInspector(props) {
                                 : ""}
                         </div>
                     </div>
+                    { props.selectedCourse && props.selectedCourse.programming_language &&
+                        <div className="inspector-row grid grid-cols2 gap-2">
+                            <div className="inspector-data-label text-gray-500">
+                                Programming Language(s):
+                            </div>
+                            <div className="inspector-data-value text-gray-700">
+                                {props.selectedCourse.programming_language}
+                            </div>
+                        </div>
+                    }
                     <div className="inspector-row grid grid-cols2 gap-2">
                         <div className="inspector-data-label text-gray-500">
                             Description:
