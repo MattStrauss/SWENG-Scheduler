@@ -19,6 +19,9 @@
                 @endif
             @endforeach
         </p>
+        @if ($course->programming_language)
+            <p><strong>Programming Language(s)</strong>: {{$course->programming_language}}</p>
+        @endif
 
         <p><strong>Professor(s)</strong>:
             @if ($course->professors->isNotEmpty())

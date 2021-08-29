@@ -28,7 +28,7 @@
         </div>
     </div>
 </div>
-<div class="flex flex-wrap -mx-3 mb-2">
+<div class="flex flex-wrap -mx-3 mb-6">
     <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
         <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-semester">
             Semester
@@ -38,6 +38,12 @@
             <option @if($course->semesters->contains(2)) selected @endif value="2">Spring</option>
             <option @if($course->semesters->contains(3)) selected @endif value="3">Summer</option>
         </select>
+    </div>
+    <div class="w-full md:w-2/5 px-3">
+        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-langs">
+            Programming Language(s)
+        </label>
+        <input name="programming_language" value="{{$course->programming_language ?? old('programming_language')}}" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-langs" type="text" placeholder="C++, Java, PHP">
     </div>
     <div class="w-full md:w-2/5 px-3 mb-6 md:mb-0">
         <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-prerequisites">
@@ -50,6 +56,9 @@
             @endforeach
         </select>
     </div>
+</div>
+
+<div class="flex flex-wrap -mx-3 mb-6">
     <div class="w-full md:w-2/5 px-3 mb-6 md:mb-0">
         <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-prerequisites">
             Professors
